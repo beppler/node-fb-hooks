@@ -27,11 +27,12 @@ app.get('/', function(req, res) {
 var token = process.env.TOKEN || 'token';
 
 app.get(['/facebook'], function(req, res) {
-  if (req.query['hub.mode'] == 'subscribe' && req.query['hub.verify_token'] == token) {
-    res.send(req.query['hub.challenge']);
-  } else {
+  if (req.query['hub.mode'] !== 'subscribe' || req.query['hub.verify_token'] !== token) {
     res.sendStatus(400);
+    return;
   }
+
+  res.send(req.query['hub.challenge']);
 });
 
 app.post('/facebook', function(req, res) {
@@ -48,3 +49,4 @@ app.post('/facebook', function(req, res) {
   received_updates.unshift(req.body);
   res.sendStatus(200);
 });
+
